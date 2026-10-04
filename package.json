@@ -1,0 +1,22 @@
+{
+  "name": "rumah-pintar-3d",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Simulasi IoT smart home 3D berbasis Three.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@fontsource/carlito": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.2.0",
+    "three": "^0.186.1"
+  },
+  "devDependencies": {
+    "@types/three": "^0.186.0",
+    "typescript": "~5.9.0",
+    "vite": "^8.3.2"
+  }
+}

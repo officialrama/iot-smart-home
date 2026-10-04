@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="Simulasi IoT smart home 3D: jadwal harian, skenario pulang, otomasi gerbang, rumah, dan keamanan." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Rumah Pintar 3D</title>
+  </head>
+  <body>
+    <div class="app">
+      <main class="stage" id="stage">
+        <div class="stage-top">
+          <div class="chips">
+            <span class="chip"><span class="dot"></span>Broker MQTT terhubung</span>
+            <span class="chip mode-chip" id="mode-chip">Mode: Tidur</span>
+          </div>
+          <div class="stage-ctrls">
+            <button class="chip chip-btn" id="ph-show" aria-pressed="true" title="Tampilkan atau sembunyikan HP">HP<span class="ph-badge" id="ph-show-badge" hidden>0</span></button>
+            <div class="seg" role="group" aria-label="Cuaca">
+              <button id="wx-sun" aria-pressed="true">Cerah</button>
+              <button id="wx-rain" aria-pressed="false">Hujan</button>
+            </div>
+            <div class="seg" role="group" aria-label="Sudut kamera">
+              <button data-view="rumah" aria-pressed="true">Rumah</button>
+              <button data-view="halaman" aria-pressed="false">Halaman</button>
+              <button data-view="belakang" aria-pressed="false">Dapur</button>
+              <button data-view="samping" aria-pressed="false">Samping</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flow" id="flow" hidden></div>
+
+        <div class="phone" id="phone"></div>
+
+        <div class="timeline" id="timeline"></div>
+
+        <div class="tip" id="tip" hidden></div>
+        <div class="loading" id="loading">Memuat rumah…</div>
+      </main>
+
+      <aside class="panel">
+        <header class="head">
+          <p class="eyebrow">Simulasi IoT smart home</p>
+          <h1>Rumah Pintar 3D</h1>
+        </header>
+        <nav class="tabs" role="tablist">
+          <button role="tab" id="tab-kendali" aria-selected="true" aria-controls="pane-kendali">Kendali</button>
+          <button role="tab" id="tab-otomasi" aria-selected="false" aria-controls="pane-otomasi">Otomasi</button>
+          <button role="tab" id="tab-log" aria-selected="false" aria-controls="pane-log">Log MQTT</button>
+        </nav>
+        <section class="pane" id="pane-kendali" role="tabpanel"></section>
+        <section class="pane" id="pane-otomasi" role="tabpanel" hidden></section>
+        <section class="pane" id="pane-log" role="tabpanel" hidden><div class="log" id="log"></div></section>
+      </aside>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
