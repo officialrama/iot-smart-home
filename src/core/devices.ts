@@ -3,7 +3,7 @@ export type DeviceId =
   | "lampLorong" | "waterHeater"
   | "lampKamar" | "fan"
   | "garage" | "lampCarport"
-  | "lampTeras" | "gate" | "cctv" | "sprinkler" | "gardenLight"
+  | "lampTeras" | "gate" | "gateKecil" | "cctv" | "sprinkler" | "gardenLight"
   | "pompaAir" | "katupAir" | "atapJemuran" | "alarm" | "sirene";
 
 export type IconName =
@@ -42,7 +42,8 @@ export const DEVICES: DeviceDef[] = [
   { id: "garage", name: "Pintu garasi", room: "garasi", icon: "garage", onLabel: "Terbuka", offLabel: "Tertutup", watt: 0, motorWatt: 400, speed: 0.45 },
   { id: "lampCarport", name: "Lampu carport", room: "garasi", icon: "lamp", onLabel: "Menyala", offLabel: "Mati", watt: 15 },
   { id: "lampTeras", name: "Lampu teras", room: "teras", icon: "lamp", onLabel: "Menyala", offLabel: "Mati", watt: 15 },
-  { id: "gate", name: "Gerbang", room: "halaman", icon: "gate", onLabel: "Terbuka", offLabel: "Tertutup", watt: 0, motorWatt: 300, speed: 0.38 },
+  { id: "gate", name: "Gerbang besar", room: "halaman", icon: "gate", onLabel: "Terbuka", offLabel: "Tertutup", watt: 0, motorWatt: 300, speed: 0.38 },
+  { id: "gateKecil", name: "Gerbang kecil", room: "halaman", icon: "gate", onLabel: "Terbuka", offLabel: "Tertutup", watt: 0, motorWatt: 60, speed: 0.8 },
   { id: "cctv", name: "CCTV", room: "halaman", icon: "cctv", onLabel: "Merekam", offLabel: "Mati", watt: 6 },
   { id: "sprinkler", name: "Pompa taman", room: "halaman", icon: "water", onLabel: "Menyiram", offLabel: "Mati", watt: 250, cool: true },
   { id: "gardenLight", name: "Lampu taman", room: "halaman", icon: "post", onLabel: "Menyala", offLabel: "Mati", watt: 20 },

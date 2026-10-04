@@ -19,7 +19,7 @@ const ROOM_GROUPS: { title: string; rooms: Room[] }[] = [
 
 /** Sudut kamera yang paling pas untuk menonton tiap uji aturan. */
 const RULE_VIEW: Record<string, View> = {
-  gerbangHp: "halaman", tamuGerbang: "halaman", tutupSendiri: "halaman", lupaMenutup: "halaman",
+  gerbangHp: "halaman", tamuGerbang: "halaman", tutupSendiri: "halaman", gerbangKecil: "halaman", lupaMenutup: "halaman",
   lampuTeras: "rumah", siramTaman: "halaman", lampuMalam: "belakang", acHemat: "rumah", airHangat: "belakang",
   pompaPintar: "samping", modeNonton: "rumah", jemuran: "samping", adaYangMasuk: "halaman", gas: "belakang",
   bocorAir: "belakang", anakPulang: "halaman", liburan: "rumah", listrikBoros: "rumah"

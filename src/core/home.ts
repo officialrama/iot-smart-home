@@ -1,4 +1,4 @@
-import type { ActorsApi, FxApi, Vec2 } from "./actors";
+import type { ActorsApi, FxApi, PersonApi, Vec2 } from "./actors";
 import { SimClock, fmt, hm } from "./clock";
 import { DEVICE_BY_ID, type DeviceId, type DeviceStore, type Source } from "./devices";
 import { Bus, Tasks } from "./events";
@@ -70,6 +70,7 @@ const P = {
   dalamPintu: { x: -2.4, z: 4.2 },
   ruangTamu: { x: -4, z: 1.5 },
   celahPagar: { x: -2.4, z: 13.1 },
+  dalamGerbangKecil: { x: -2.4, z: 10.8 },
   trotoarBarat: { x: -16, z: 13.1 },
   trotoarTimur: { x: 18, z: 13.1 },
   depanBel: { x: 2.3, z: 13.0 },
@@ -154,6 +155,12 @@ export class Home {
         saat: "mobil sudah masuk dan terdeteksi sensor.",
         maka: "gerbang menutup otomatis dengan aman.",
         tests: [{ label: "Mobil pulang", run: () => this.pulang("tombol") }]
+      },
+      {
+        id: "gerbangKecil", group: "gerbang", icon: "people", title: "Gerbang kecil otomatis",
+        saat: "penghuni terdaftar berjalan mendekat ke gerbang kecil.",
+        maka: "gerbang kecil membuka sendiri, lalu menutup setelah dilewati.",
+        tests: [{ label: "Anak pulang sekolah", run: () => this.anakPulang() }]
       },
       {
         id: "lupaMenutup", group: "gerbang", icon: "warn", title: "Lupa menutup",
@@ -583,7 +590,7 @@ export class Home {
   tidur() {
     this.bus.log("home/scene/set", "TIDUR");
     this.env.mode = "tidur";
-    this.off(["lampTamu", "tv", "ac", "tirai", "door", "gate", "garage", "lampCarport"], "jadwal");
+    this.off(["lampTamu", "tv", "ac", "tirai", "door", "gate", "gateKecil", "garage", "lampCarport"], "jadwal");
     this.on(["lampKamar"], "jadwal", 0.2);
     this.on(["alarm", "cctv"], "jadwal");
     this.bus.notify({ title: "Mode Tidur", body: "Lampu meredup, alarm aktif, semua perangkat beristirahat.", kind: "ok" });
@@ -733,14 +740,18 @@ export class Home {
     if (this.env.mode !== "pergi") await this.pergi(false);
     const x = this.actors.person("penyusup");
     x.place(P.trotoarBarat);
-    await x.walk([P.celahPagar, P.terasDepanPintu], 1.8);
+    await x.walk([P.celahPagar], 1.8);
+    await this.tasks.sleep(0.6);
+    this.store.set("gateKecil", true, "paksa");
+    await this.tasks.until(() => this.store.state.gateKecil.t > 0.8);
+    await x.walk([P.dalamGerbangKecil, P.terasDepanPintu], 1.8);
     await this.tasks.sleep(0.6);
     this.store.set("door", true, "paksa");
     await this.tasks.sleep(1.6);
     this.fx.bubble(x.pos.x, 2.1, x.pos.z, "!!!", 1.4);
-    await x.walk([P.celahPagar, P.trotoarBarat], 4.2);
+    await x.walk([P.dalamGerbangKecil, P.celahPagar, P.trotoarBarat], 4.2);
     x.hide();
-    this.off(["door"], "app");
+    this.off(["door", "gateKecil"], "app");
     this.running.delete("penyusup");
   }
 
@@ -749,7 +760,9 @@ export class Home {
     this.running.add("anak");
     const a = this.actors.person("anak");
     a.place(P.trotoarTimur);
-    await a.walk([P.celahPagar, P.terasDepanPintu]);
+    await a.walk([P.celahPagar]);
+    await this.lewatGerbangKecil(a);
+    await a.walk([P.terasDepanPintu]);
     this.fx.bubble(-1.75, 1.4, 6.2, "PIN • • • •", 1.6);
     await this.tasks.sleep(1.6);
     if (this.store.state.alarm.on) this.off(["alarm"], "pin-anak");
@@ -765,10 +778,25 @@ export class Home {
     this.running.delete("anak");
   }
 
+  /** Orang berdiri di luar gerbang kecil: buka, lewati, lalu tutup lagi di belakangnya. */
+  private async lewatGerbangKecil(p: PersonApi) {
+    if (this.fired("gerbangKecil")) {
+      this.store.set("gateKecil", true, "otomasi");
+    } else {
+      // Tanpa otomasi: buka manual dengan PIN di keypad gerbang.
+      this.fx.bubble(-2.4, 1.9, 12.4, "PIN • • • •", 1.6);
+      await this.tasks.sleep(1.6);
+      this.store.set("gateKecil", true, "pin-anak");
+    }
+    await this.tasks.until(() => this.store.state.gateKecil.t > 0.8);
+    await p.walk([P.dalamGerbangKecil]);
+    this.off(["gateKecil"]);
+  }
+
   liburan(on: boolean) {
     if (on) {
       this.env.mode = "liburan";
-      this.off(["lampTamu", "lampKamar", "lampTeras", "lampCarport", "ac", "tv", "fan", "door", "gate", "garage"]);
+      this.off(["lampTamu", "lampKamar", "lampTeras", "lampCarport", "ac", "tv", "fan", "door", "gate", "gateKecil", "garage"]);
       this.on(["alarm", "cctv"]);
       this.actors.person("penghuni").hide();
       this.nextVacationSwap = 0;

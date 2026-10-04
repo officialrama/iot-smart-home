@@ -32,6 +32,7 @@ export function buildDevices(scene: THREE.Scene): Updater {
     buildDoorAndAlarm(scene),
     buildGarage(scene),
     buildGate(scene),
+    buildSmallGate(scene),
     buildCctv(scene),
     buildSprinkler(scene),
     buildGardenLight(scene),
@@ -335,14 +336,36 @@ function buildGate(scene: THREE.Scene): Updater {
   };
 }
 
-// ---------- CCTV ----------
+// ---------- Gerbang kecil (ayun, untuk pejalan kaki) ----------
+function buildSmallGate(scene: THREE.Scene): Updater {
+  // Engsel di sisi pilar barat, daun membuka ke dalam halaman.
+  const pivot = new THREE.Group();
+  pivot.position.set(-2.88, 0, 12);
+  scene.add(pivot);
+  box(pivot, 0.96, 0.08, 0.06, mat.metal, 0.5, 1.45, 0);
+  box(pivot, 0.96, 0.08, 0.06, mat.metal, 0.5, 0.15, 0);
+  for (let x = 0.06; x <= 0.95; x += 0.148) box(pivot, 0.05, 1.3, 0.05, mat.metal, x, 0.8, 0);
+  const lockMat = M(0x000000, { emissive: 0xd13b3b });
+  box(pivot, 0.06, 0.1, 0.03, lockMat, 0.9, 1.0, 0.05);
+  tagDevice(pivot, "gateKecil");
+  return ({ store }) => {
+    const s = store.state.gateKecil;
+    pivot.rotation.y = ease(s.t) * 1.45;
+    lockMat.emissive.setHex(s.on ? 0x21c26b : 0xd13b3b);
+  };
+}
+
+// ---------- CCTV (di atas pintu masuk, mengawasi kedua gerbang) ----------
+const CCTV_YAW = 0.33; // arah tengah antara gerbang kecil dan gerbang besar
+const CCTV_SWEEP = 0.6;
 function buildCctv(scene: THREE.Scene): Updater {
   const yaw = new THREE.Group();
-  yaw.position.set(8.15, 2.55, 6.15);
+  yaw.position.set(-0.6, 2.6, 6.15);
+  yaw.rotation.y = CCTV_YAW;
   scene.add(yaw);
   box(yaw, 0.08, 0.3, 0.08, mat.white, 0, 0.12, 0);
   const tilt = new THREE.Group();
-  tilt.rotation.x = 0.45;
+  tilt.rotation.x = 0.32;
   yaw.add(tilt);
   box(tilt, 0.22, 0.2, 0.5, mat.white, 0, 0, 0.15);
   box(tilt, 0.16, 0.14, 0.02, mat.dark, 0, 0, 0.41);
@@ -351,7 +374,7 @@ function buildCctv(scene: THREE.Scene): Updater {
   led.position.set(0.07, 0.07, 0.42);
   tilt.add(led);
   tagDevice(yaw, "cctv");
-  const coneH = 7;
+  const coneH = 8;
   const coneMat = new THREE.MeshBasicMaterial({ color: 0xff5555, transparent: true, opacity: 0.12, depthWrite: false, side: THREE.DoubleSide });
   const cone = new THREE.Mesh(new THREE.ConeGeometry(2.4, coneH, 28, 1, true), coneMat);
   cone.rotation.x = -Math.PI / 2;
@@ -360,7 +383,7 @@ function buildCctv(scene: THREE.Scene): Updater {
   tilt.add(cone);
   return ({ store, time, reduceMotion }) => {
     const s = store.state.cctv;
-    if (!reduceMotion) yaw.rotation.y = -0.55 + Math.sin(time * 0.5) * 0.55 * s.t;
+    if (!reduceMotion) yaw.rotation.y = CCTV_YAW + Math.sin(time * 0.5) * CCTV_SWEEP * s.t;
     ledMat.emissive.setHex(s.on && Math.sin(time * 4) > 0 ? 0xff2a2a : 0x000000);
     coneMat.opacity = 0.11 * s.t;
     cone.visible = s.t > 0.01;

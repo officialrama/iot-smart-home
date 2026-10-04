@@ -72,6 +72,7 @@ export function buildHouse(scene: THREE.Scene): void {
   box(scene, 23, 0.7, 0.25, mat.stone, 2.5, 0.35, -10.9);
   for (const x of [3.0, 8.0, -3.1, -1.7]) box(scene, 0.4, 1.7, 0.4, mat.stone, x, 0.85, 12);
   box(scene, 0.4, 0.5, 0.3, mat.dark, 2.4, 0.25, 11.3); // motor gerbang
+  box(scene, 0.22, 0.3, 0.22, mat.dark, -3.1, 1.45, 11.68); // motor lengan gerbang kecil
 
   // ---------- Ruang tamu ----------
   box(scene, 3, 0.45, 1, mat.sofa, -1, 0.33, -1.4);
